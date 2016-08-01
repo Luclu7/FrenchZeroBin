@@ -1,10 +1,8 @@
-ZeroBin 0.19 Alpha
+ZeroBin 0.19 Alpha/FrenchZeroBin 0.1
 
-==== THIS IS ALPHA SOFTWARE - USE AT YOUR OWN RISKS ====
+==== CE LOGICIEL EST EN ALPHA - A VOS PROPRES RISQUES ====
 
-ZeroBin is a minimalist, opensource online pastebin where the server 
-has zero knowledge of pasted data. Data is encrypted/decrypted in the 
-browser using 256 bits AES. 
+ ZeroBin est un petit, opensource pastebin en ligne où le serveur n'a aucune information sur les donnés collés. Les donnés sont cryptés/décryptés dans le browser en AES 256 bits.
 
 More information on the project page:
 http://sebsauvage.net/wiki/doku.php?id=php:zerobin
