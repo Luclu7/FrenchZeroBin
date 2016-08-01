@@ -158,16 +158,16 @@ if (!empty($_POST['data'])) // Create new paste/comment
 
     // Make sure last paste from the IP address was more than 10 seconds ago.
     if (!trafic_limiter_canPass($_SERVER['REMOTE_ADDR']))
-        { echo json_encode(array('status'=>1,'message'=>'Please wait 10 seconds between each post.')); exit; }
+        { echo json_encode(array('status'=>1,'message'=>'Veuillez patienter 10 secondes ! Protection anti-spam.')); exit; }
 
     // Make sure content is not too big.
     $data = $_POST['data'];
     if (strlen($data)>2000000)
-        { echo json_encode(array('status'=>1,'message'=>'Paste is limited to 2 Mb of encrypted data.')); exit; }
+        { echo json_encode(array('status'=>1,'message'=>'Le texte est limité à 2Mb.')); exit; }
 
     // Make sure format is correct.
     if (!validSJCL($data))
-        { echo json_encode(array('status'=>1,'message'=>'Invalid data.')); exit; }
+        { echo json_encode(array('status'=>1,'message'=>'Données invalides.')); exit; }
 
     // Read additional meta-information.
     $meta=array();
@@ -207,7 +207,7 @@ if (!empty($_POST['data'])) // Create new paste/comment
         $syntaxcoloring = $_POST['syntaxcoloring'];
         if ($syntaxcoloring!='0' && $syntaxcoloring!='1') { $error=true; }
         if ($syntaxcoloring!='0') { $meta['syntaxcoloring']=true; }
-    }    
+    }
 
     // You can't have an open discussion on a "Burn after reading" paste:
     if (isset($meta['burnafterreading'])) unset($meta['opendiscussion']);
@@ -237,7 +237,7 @@ if (!empty($_POST['data'])) // Create new paste/comment
 
     if ($error)
     {
-        echo json_encode(array('status'=>1,'message'=>'Invalid data.'));
+        echo json_encode(array('status'=>1,'message'=>'Données invalides'));
         exit;
     }
 
@@ -255,8 +255,8 @@ if (!empty($_POST['data'])) // Create new paste/comment
     {
         $pasteid = $_POST['pasteid'];
         $parentid = $_POST['parentid'];
-        if (!preg_match('/\A[a-f\d]{16}\z/',$pasteid)) { echo json_encode(array('status'=>1,'message'=>'Invalid data.')); exit; }
-        if (!preg_match('/\A[a-f\d]{16}\z/',$parentid)) { echo json_encode(array('status'=>1,'message'=>'Invalid data.')); exit; }
+        if (!preg_match('/\A[a-f\d]{16}\z/',$pasteid)) { echo json_encode(array('status'=>1,'message'=>'Données invalides.')); exit; }
+        if (!preg_match('/\A[a-f\d]{16}\z/',$parentid)) { echo json_encode(array('status'=>1,'message'=>'Données invalides.')); exit; }
 
         unset($storage['expire_date']); // Comment do not expire (it's the paste that expires)
         unset($storage['opendiscussion']);
@@ -264,18 +264,18 @@ if (!empty($_POST['data'])) // Create new paste/comment
 
         // Make sure paste exists.
         $storagedir = dataid2path($pasteid);
-        if (!is_file($storagedir.$pasteid)) { echo json_encode(array('status'=>1,'message'=>'Invalid data.')); exit; }
+        if (!is_file($storagedir.$pasteid)) { echo json_encode(array('status'=>1,'message'=>'Données invalides.')); exit; }
 
         // Make sure the discussion is opened in this paste.
         $paste=json_decode(file_get_contents($storagedir.$pasteid));
-        if (!$paste->meta->opendiscussion) { echo json_encode(array('status'=>1,'message'=>'Invalid data.')); exit; }
+        if (!$paste->meta->opendiscussion) { echo json_encode(array('status'=>1,'message'=>'Données invalides.')); exit; }
 
         $discdir = dataid2discussionpath($pasteid);
         $filename = $pasteid.'.'.$dataid.'.'.$parentid;
         if (!is_dir($discdir)) mkdir($discdir,$mode=0705,$recursive=true);
         if (is_file($discdir.$filename)) // Oups... improbable collision.
         {
-            echo json_encode(array('status'=>1,'message'=>'You are unlucky. Try again.'));
+            echo json_encode(array('status'=>1,'message'=>'Vous n\'avez pas de chance. Merci de réessayer'));
             exit;
         }
 
@@ -289,7 +289,7 @@ if (!empty($_POST['data'])) // Create new paste/comment
         if (!is_dir($storagedir)) mkdir($storagedir,$mode=0705,$recursive=true);
         if (is_file($storagedir.$dataid)) // Oups... improbable collision.
         {
-            echo json_encode(array('status'=>1,'message'=>'You are unlucky. Try again.'));
+            echo json_encode(array('status'=>1,'message'=>'Vous n\'avez pas de chance. Merci de réessayer'));
             exit;
         }
         // New paste
@@ -304,7 +304,7 @@ if (!empty($_POST['data'])) // Create new paste/comment
         exit;
     }
 
-echo json_encode(array('status'=>1,'message'=>'Server error.'));
+echo json_encode(array('status'=>1,'message'=>'Erreur serveur.'));
 exit;
 }
 
@@ -318,22 +318,22 @@ function processPasteDelete($pasteid,$deletetoken)
         $filename = dataid2path($pasteid).$pasteid;
         if (!is_file($filename)) // Check that paste exists.
         {
-            return array('','Paste does not exist, has expired or has been deleted.','');
+            return array('','Le texte n\'existe plus, a été supprimé ou a expiré.','');
         }
     }
     else
     {
-        return array('','Invalid data','');
+        return array('','Données invalides','');
     }
 
     if (!slow_equals($deletetoken, hash_hmac('sha1', $pasteid , getServerSalt()))) // Make sure token is valid.
     {
-        return array('','Wrong deletion token. Paste was not deleted.','');
+        return array('','Le jeton de suppression est invalide, le texte n\'est pas supprimé.','');
     }
 
     // Paste exists and deletion token is valid: Delete the paste.
     deletePaste($pasteid);
-    return array('','','Paste was properly deleted.');
+    return array('','','Texte supprimé avec succès.');
 }
 
 /* Process a paste fetch request.
@@ -346,12 +346,12 @@ function processPasteFetch($pasteid)
         $filename = dataid2path($pasteid).$pasteid;
         if (!is_file($filename)) // Check that paste exists.
         {
-            return array('','Paste does not exist, has expired or has been deleted.','');
+            return array('','Le texte n\'esxiste pas, a expiré ou a été supprimé.','');
         }
     }
     else
     {
-        return array('','Invalid data','');
+        return array('','Données invalides','');
     }
 
     // Get the paste itself.
@@ -361,7 +361,7 @@ function processPasteFetch($pasteid)
     if (isset($paste->meta->expire_date) && $paste->meta->expire_date<time())
     {
         deletePaste($pasteid);  // Delete the paste
-        return array('','Paste does not exist, has expired or has been deleted.','');
+        return array('','Le texte n\'esxiste pas, a expiré ou a été supprimé.','');
     }
 
 
@@ -415,7 +415,7 @@ if (!empty($_GET['deletetoken']) && !empty($_GET['pasteid'])) // Delete an exist
 }
 else if (!empty($_SERVER['QUERY_STRING']))  // Return an existing paste.
 {
-    list ($CIPHERDATA, $ERRORMESSAGE, $STATUS) = processPasteFetch($_SERVER['QUERY_STRING']);    
+    list ($CIPHERDATA, $ERRORMESSAGE, $STATUS) = processPasteFetch($_SERVER['QUERY_STRING']);
 }
 
 require_once "lib/rain.tpl.class.php";
