@@ -208,7 +208,7 @@ function displayMessages(key, comments) {
     // Display paste expiration.
     if (comments[0].meta.expire_date) $('div#remainingtime').removeClass('foryoureyesonly').text('This document will expire in '+secondsToHuman(comments[0].meta.remaining_time)+'.').show();
     if (comments[0].meta.burnafterreading) {
-        $('div#remainingtime').addClass('foryoureyesonly').text('FOR YOUR EYES ONLY.  Don\'t close this window, this message can\'t be displayed again.').show();
+        $('div#remainingtime').addClass('foryoureyesonly').text('POUR VOS YEUX SEULEMENT.  Ne fermez pas cette fenêtre, ce message ne peut être aficher à nouveau.').show();
         $('button#clonebutton').hide(); // Discourage cloning (as it can't really be prevented).
     }
 
